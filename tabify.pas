@@ -24,7 +24,10 @@ var
     cmdline_count:	integer;
 	filename:	string(20);
 	offset:	integer;
-	SpacesPerTab: integer;
+	errorCode: integer;
+	spacesPerTab: integer;
+	temp: string(20);
+	paramIndex: integer;
 	
 begin
 	cmdline_count := ParamCount;
@@ -35,9 +38,14 @@ begin
 	if IsOnCommandLine('-n') > 0 then
 	    begin
 	    { find the index of the = character }
-	    offset := index(ParamStr(IsOnCommandLine('-n')), '=');
-	    writeln(substr(ParamStr(IsOnCommandLine('-n')), offset);
-		writeln('Spaces per tab = ');
+	    paramIndex := IsOnCommandLine('-n');
+	    if (paramIndex > 0) then
+	    	begin
+	    	temp := ParamStr(paramIndex);
+	    	offset := index(temp, '=') + 1;
+			Val(substr(temp, offset), spacesPerTab, errorCode);
+			writeln('Spaces per tab = ', spacesPerTab);
+			end;
 		end;
 end.
 
