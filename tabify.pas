@@ -21,22 +21,46 @@ end;
 	
 }
 var
-    cmdline_count:	integer;
-	filename:	string(20);
-	offset:	integer;
-	errorCode: integer;
-	spacesPerTab: integer;
-	temp: string(20);
-	paramIndex: integer;
+	errorCode: 		integer;
+	filename:		string(20);
+	offset:			integer;
+	paramIndex: 	integer;
+	spacesPerTab: 	integer;
+	temp: 			string(20);
 	
 begin
-	cmdline_count := ParamCount;
-    filename := ParamStr (1);
-	writeln('Updating file:', filename);
+	writeln(ParamCount);
+	if ParamCount < 2 then
+		begin
+		writeln('Error: Missing arguments...');
+		end
+	else if ParamCount = 2 then
+		begin
+		writeln('Input file: ',paramStr(1));
+		writeln('Output file: ',paramStr(2));
+		end
+	else if ParamCount = 3 then
+		begin
+		writeln('Optional argument: ',paramStr(1));
+		writeln('Input file: ',paramStr(2));
+		writeln('Output file: ',paramStr(3));
+		end
+	else if ParamCount = 4 then
+		begin
+		writeln('Optional argument: ',paramStr(1));
+		writeln('Optional argument: ',paramStr(2));
+		writeln('Input file: ',paramStr(3));
+		writeln('Output file: ',paramStr(4));
+		end;
+		
 	if IsOnCommandLine('-x') > 0 then
+		begin
 		writeln('Remove tabs');
+		end;
+		
 	if IsOnCommandLine('-n') > 0 then
 	    begin
+
 	    { find the index of the = character }
 	    paramIndex := IsOnCommandLine('-n');
 	    if (paramIndex > 0) then
