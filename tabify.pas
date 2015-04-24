@@ -15,53 +15,53 @@ begin
 		end;
 end;
 
+Function GetNumberOfOptionalParams: integer;
+var
+    counter: Integer;
+
+begin
+    counter := 0;
+	if IsOnCommandLine('-x') > 0 then
+		counter := counter + 1;
+	if IsOnCommandLine('-n') > 0 then
+		counter := counter + 1;
+
+    GetNumberOfOptionalParams := counter;
+end;
+
+Procedure DisplayUsage;
+begin
+    writeln('Invalid command...');
+end;
+
 { 
 	-x 		convert tabs to spaces
 	-n=### 	number of spaces per tab (4 by default)
 	
 }
+const  
+	OPTIONS : array [0..2] of String[3] = ('-x', '-n');  
+
 var
-	errorCode: 		integer;
-	filename:		string(20);
-	offset:			integer;
-	paramIndex: 	integer;
-	spacesPerTab: 	integer;
-	temp: 			string(20);
+	i:	integer;
+	optionalParams:			integer;
 	
 begin
-	writeln(ParamCount);
-	if ParamCount < 2 then
+	optionalParams := GetNumberOfOptionalParams();
+	if ((ParamCount - optionalParams) < 2) or (ParamCount > 4) then
 		begin
-		writeln('Error: Missing arguments...');
+		DisplayUsage;
 		end
-	else if ParamCount = 2 then
+	else
 		begin
 		writeln('Input file: ',paramStr(1));
 		writeln('Output file: ',paramStr(2));
-		end
-	else if ParamCount = 3 then
-		begin
-		writeln('Optional argument: ',paramStr(1));
-		writeln('Input file: ',paramStr(2));
-		writeln('Output file: ',paramStr(3));
-		end
-	else if ParamCount = 4 then
-		begin
-		writeln('Optional argument: ',paramStr(1));
-		writeln('Optional argument: ',paramStr(2));
-		writeln('Input file: ',paramStr(3));
-		writeln('Output file: ',paramStr(4));
 		end;
-		
-	if IsOnCommandLine('-x') > 0 then
-		begin
-		writeln('Remove tabs');
-		end;
-		
+				
 	if IsOnCommandLine('-n') > 0 then
 	    begin
 
-	    { find the index of the = character }
+	    { find the index of the = character 
 	    paramIndex := IsOnCommandLine('-n');
 	    if (paramIndex > 0) then
 	    	begin
@@ -69,7 +69,7 @@ begin
 	    	offset := index(temp, '=') + 1;
 			Val(substr(temp, offset), spacesPerTab, errorCode);
 			writeln('Spaces per tab = ', spacesPerTab);
-			end;
+			end; }
 		end;
 end.
 
