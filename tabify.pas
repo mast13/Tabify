@@ -39,23 +39,40 @@ end;
 	-n=### 	number of spaces per tab (4 by default)
 	
 }
-const  
-	OPTIONS : array [0..2] of String[3] = ('-x', '-n');  
 
 var
 	i:	integer;
 	optionalParams:			integer;
+	pIndex:	integer;
 	
 begin
-	optionalParams := GetNumberOfOptionalParams();
-	if ((ParamCount - optionalParams) < 2) or (ParamCount > 4) then
+	pIndex := 0;	
+	if (ParamCount < 2) or (ParamCount > 4) then
 		begin
 		DisplayUsage;
 		end
 	else
 		begin
-		writeln('Input file: ',paramStr(1));
-		writeln('Output file: ',paramStr(2));
+    	for i := 1 to ParamCount do
+			begin
+			if (ParamStr(i) = '-x') then
+			    begin
+			    writeln('Replace tabs with spaces...');
+			    end
+			else if (ParamStr(i) = '-n') then
+			    begin
+			    writeln('Spaces per tab...');
+			    end
+			else if (pIndex = 0) then
+				begin
+				writeln('Input file: ',ParamStr(i));
+				pIndex := 1;
+				end
+			else if (pIndex = 1) then
+				begin
+				writeln('Output file: ',ParamStr(i));
+				end;
+			end;
 		end;
 				
 	if IsOnCommandLine('-n') > 0 then
