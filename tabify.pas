@@ -4,24 +4,34 @@ Procedure DisplayUsage;
 begin
     writeln('Invalid command...');
 end;
-          
+                    
 Procedure ReplaceSpacesWithTabs(inputFileName:string; outputFileName:string; spacesPerTab:integer);
 var
+	b: BindingType;
 	inFile: Text;
 	line: string(255);
 	
 begin
     writeln('ReplaceSpacesWithTabs...', inputFileName);
-    	
-    assign(inFile, inputFileName);
-	reset(inFile);
-    while not(EOF(inFile)) do
-    	begin
-    	readln(inFile, line);
-    	writeln(line);
+    Unbind (inFile);
+    b := Binding (infile);	
+    b.Name := inputFileName;
+    bind(inFile,b);
+    b := Binding (infile);
+    writeln('File exists: ',b.Existing);
+    if not b.Existing then
+    	WriteLn ('File not bound -- try again.')
+    else
+    	begin	
+		assign(inFile, inputFileName);
+		reset(inFile);
+		while not(EOF(inFile)) do
+			begin
+			readln(inFile, line);
+			writeln(line);
+			end;
+		close(inFile);
     	end;
-    close(inFile);
-    
 end;
 
 Procedure ReplaceTabsWithSpaces(inputFile:string; outputFile:string; spacesPerTab:integer);
