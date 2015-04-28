@@ -8,8 +8,15 @@ end;
 Procedure ReplaceSpacesWithTabs(inputFileName:string; outputFileName:string; spacesPerTab:integer);
 var
 	b: BindingType;
+	count:	integer;
+	currentChar:	char;
+	i: integer;
+	idx: integer;
 	inFile: Text;
 	line: string(255);
+	newChar: char;
+	newLine: string(255);
+	previousChar:	char;
 	
 begin
     writeln('ReplaceSpacesWithTabs...', inputFileName);
@@ -28,7 +35,32 @@ begin
 		while not(EOF(inFile)) do
 			begin
 			readln(inFile, line);
-			writeln(line);
+			count := 1;
+			previousChar := line[1];
+			i := 1;
+			while (i <= Length(line)) do
+				begin
+				currentChar := line[i];
+				newChar := currentChar;
+				if (currentChar = previousChar) and (ord(currentChar) = 32) then
+					begin
+					count := count + 1;
+					if (count = 4) then
+						begin
+						newChar := chr(65);
+						count := 1;
+						end;
+					{ write('Consecutive spaces: ',count);}
+					end
+				else if ord(currentChar) > 32 then
+					begin
+					count := 1;
+					end;
+				write(newChar);
+				previousChar := currentChar;
+				i := i + 1;
+				end;
+			writeln;
 			end;
 		close(inFile);
     	end;
