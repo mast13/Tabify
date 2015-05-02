@@ -4,19 +4,23 @@ Procedure DisplayUsage;
 begin
     writeln('Invalid command...');
 end;
-                    
+{
+If the current line has more than 2 consecutive spaces and the last space is in a 
+column that is a multiple of spacesPerTab, then replace those spaces with a tab
+character.
+}                    
 Procedure ReplaceSpacesWithTabs(inputFileName:string; outputFileName:string; spacesPerTab:integer);
 var
 	b: BindingType;
-	count:	integer;
-	currentChar:	char;
+	consecutiveSpaces: boolean;
 	i: integer;
 	idx: integer;
 	inFile: Text;
+	lastCharacterIdx: integer;
 	line: string(255);
-	newChar: char;
-	newLine: string(255);
-	previousChar:	char;
+	newWord: string(255);
+	word: string(255);
+	
 	
 begin
     writeln('ReplaceSpacesWithTabs...', inputFileName);
@@ -27,7 +31,7 @@ begin
     b := Binding (infile);
     writeln('File exists: ',b.Existing);
     if not b.Existing then
-    	WriteLn ('File not bound -- try again.')
+    	WriteLn ('File not found -- try again.')
     else
     	begin	
 		assign(inFile, inputFileName);
@@ -35,31 +39,31 @@ begin
 		while not(EOF(inFile)) do
 			begin
 			readln(inFile, line);
-			count := 1;
-			previousChar := line[1];
-			i := 1;
-			while (i <= Length(line)) do
+			idx := spacesPerTab;
+			while (idx <= Length(line)) do
 				begin
-				currentChar := line[i];
-				newChar := currentChar;
-				if (currentChar = previousChar) and (ord(currentChar) = 32) then
+				word := substr(line, idx - spacesPerTab + 1, spacesPerTab);
+				newWord := word;
+				if (ord(word[spacesPerTab]) =  32) then
 					begin
-					count := count + 1;
-					if (count = 4) then
+					consecutiveSpaces := false;
+					i := spacesPerTab - 1;
+					while (i >= 1) and (ord(word[i]) = 32) do
 						begin
-						newChar := chr(65);
-						count := 1;
+						i := i - 1;
+						consecutiveSpaces := true;
 						end;
-					{ write('Consecutive spaces: ',count);}
-					end
-				else if ord(currentChar) > 32 then
-					begin
-					count := 1;
+					if consecutiveSpaces then
+						begin	
+						//newWord := substr(word, 1, i) + '^';	 
+						newWord := substr(word, 1, i) + #9;
+						end;
 					end;
-				write(newChar);
-				previousChar := currentChar;
-				i := i + 1;
+				idx := idx + spacesPerTab;
+				write(newWord);
 				end;
+			idx := idx - spacesPerTab;
+			word := substr(line, idx+1, Length(line) - idx); 
 			writeln;
 			end;
 		close(inFile);
