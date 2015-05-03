@@ -4,33 +4,42 @@ Procedure DisplayUsage;
 begin
     writeln('Invalid command...');
 end;
-{
-If the current line has more than 2 consecutive spaces and the last space is in a 
-column that is a multiple of spacesPerTab, then replace those spaces with a tab
-character.
-}                    
+
+
+// If the current line has more than 2 consecutive spaces and the last space is in a 
+// column that is a multiple of spacesPerTab, then replace those spaces with a tab
+// character.
+//                    
 Procedure ReplaceSpacesWithTabs(inputFileName:string; outputFileName:string; spacesPerTab:integer);
 var
-	b: BindingType;
+	infileBinding: BindingType;
+	outfileBinding: BindingType;
 	consecutiveSpaces: boolean;
 	i: integer;
 	idx: integer;
 	inFile: Text;
+	outFile: Text;
 	lastCharacterIdx: integer;
 	line: string(255);
 	newWord: string(255);
 	word: string(255);
-	
-	
+		
 begin
     writeln('ReplaceSpacesWithTabs...', inputFileName);
+    Unbind (outFile);
+    outfileBinding := Binding (outFile);
+    outfileBinding.Name := outputFileName;
+    bind(outFile, outfileBinding);
+    outfileBinding := Binding (outfile);
+    assign(outFile, outputFileName);
+    rewrite(outFile);
+    
     Unbind (inFile);
-    b := Binding (infile);	
-    b.Name := inputFileName;
-    bind(inFile,b);
-    b := Binding (infile);
-    writeln('File exists: ',b.Existing);
-    if not b.Existing then
+    infileBinding := Binding (inFile);	
+    infileBinding.Name := inputFileName;
+    bind(inFile,infileBinding);
+    infileBinding := Binding (infile);
+    if not infileBinding.Existing then
     	WriteLn ('File not found -- try again.')
     else
     	begin	
@@ -55,30 +64,66 @@ begin
 						end;
 					if consecutiveSpaces then
 						begin	
-						//newWord := substr(word, 1, i) + '^';	 
 						newWord := substr(word, 1, i) + #9;
 						end;
 					end;
 				idx := idx + spacesPerTab;
-				write(newWord);
+				if Length(outputFileName) > 0 then
+					write(outFile, newWord)
+				else
+					write(newWord);
 				end;
 			idx := idx - spacesPerTab;
-			word := substr(line, idx+1, Length(line) - idx); 
-			writeln;
+			word := substr(line, idx+1, Length(line) - idx);
+			if Length(outputFileName) > 0 then 
+				writeln(outFile, word)
+			else
+				writeln(word);
 			end;
 		close(inFile);
     	end;
 end;
 
-Procedure ReplaceTabsWithSpaces(inputFile:string; outputFile:string; spacesPerTab:integer);
+Procedure ReplaceTabsWithSpaces(inputFileName:string; outputFileName:string; spacesPerTab:integer);
+var
+	infileBinding: BindingType;
+	outfileBinding: BindingType;
+	inFile: Text;
+	outFile: Text;
+	line: string(255);
+
 begin
-    writeln('RepplaceSpacesWithTabs...');
+    writeln('ReplaceSpacesWithTabs...');
+    Unbind (outFile);
+    outfileBinding := Binding (outFile);
+    outfileBinding.Name := outputFileName;
+    bind(outFile, outfileBinding);
+    outfileBinding := Binding (outfile);
+    assign(outFile, outputFileName);
+    rewrite(outFile);
+    
+    Unbind (inFile);
+    infileBinding := Binding (inFile);	
+    infileBinding.Name := inputFileName;
+    bind(inFile,infileBinding);
+    infileBinding := Binding (infile);
+    if not infileBinding.Existing then
+    	WriteLn ('File not found -- try again.')
+    else
+    	begin	
+		assign(inFile, inputFileName);
+		reset(inFile);
+		while not(EOF(inFile)) do
+			begin
+			readln(inFile, line);
+			writeln(line);
+			end;
+		end;
 end;
 
 { 
 	-x 		convert tabs to spaces
-	-n=### 	number of spaces per tab (4 by default)
-	
+	-n=### 	number of spaces per tab (4 by default)	
 }
 var
     errorPosition: integer;
