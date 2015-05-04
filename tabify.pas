@@ -1,11 +1,14 @@
 Program Tabify (input, output);
 
+//
+// Display usage summary if command line parameters are missing or invalid
+//
 Procedure DisplayUsage;
 begin
     writeln('Invalid command...');
 end;
 
-
+//
 // If the current line has more than 2 consecutive spaces and the last space is in a 
 // column that is a multiple of spacesPerTab, then replace those spaces with a tab
 // character.
@@ -81,19 +84,26 @@ begin
 				writeln(word);
 			end;
 		close(inFile);
+		close(outfile);
     	end;
 end;
 
+//
+// Replace every tab with spacesPerTab spaces.
+//
 Procedure ReplaceTabsWithSpaces(inputFileName:string; outputFileName:string; spacesPerTab:integer);
 var
 	infileBinding: BindingType;
 	outfileBinding: BindingType;
+	i:integer;
+	idx: integer;
 	inFile: Text;
 	outFile: Text;
 	line: string(255);
 
 begin
-    writeln('ReplaceSpacesWithTabs...');
+    writeln('ReplaceTabsWithSpaces...');
+    writeln('spacesPerTab: ',spacesPerTab);
     Unbind (outFile);
     outfileBinding := Binding (outFile);
     outfileBinding.Name := outputFileName;
@@ -116,9 +126,23 @@ begin
 		while not(EOF(inFile)) do
 			begin
 			readln(inFile, line);
-			writeln(line);
+			idx := 1;
+			while (idx <= Length(line)) do
+				begin
+				if ord(line[idx]) = 9 then
+					begin
+					for i := 1 to spacesPerTab do
+						write('-');
+					end
+				else
+					write(line[idx]);
+				idx := idx + 1;
+				end;
+			writeln;
 			end;
 		end;
+		close(infile);
+		close(outfile);
 end;
 
 { 
@@ -174,15 +198,17 @@ begin
 				outputFile := ParamStr(i);
 				end;
 			end;
-		end;
 
-	if (ReplaceSpaces) then
-		begin
-		ReplaceSpacesWithTabs(inputFile, outputFile, spacesPerTab);
-		end
-	else
-		begin
-		ReplaceTabsWithSpaces(inputFile, outputFile, spacesPerTab);
+		writeln('*** ',spacesPerTab);
+		if (ReplaceSpaces) then
+			begin
+			ReplaceSpacesWithTabs(inputFile, outputFile, spacesPerTab);
+			end
+		else
+			begin
+			ReplaceTabsWithSpaces(inputFile, outputFile, spacesPerTab);
+			end;
+		
 		end;				
 end.
 
